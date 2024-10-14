@@ -40,7 +40,11 @@ NEXT_PUBLIC_API_URL=http://localhost:3000/api
 Build and start the application using Docker:
 
 ```bash
+# Docker v1
 docker-compose up --build
+
+# or Docker v2
+docker compose up --build
 ```
 
 This command will:
