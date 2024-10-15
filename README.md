@@ -1,6 +1,12 @@
+
+
 # Document AI Assistant
 
 This project answers FAQs based on policy documents. The chatbot uses natural language processing  to extract relevant information from uploaded policy PDFs and respond to user queries.
+<p align="center">
+  <img width="879" alt="Screenshot 2024-10-15 at 11 28 18 AM" src="https://github.com/user-attachments/assets/75563599-5841-47cd-af27-6ce43e64c8ef">
+</p>
+
 
 ## Features
 - **Chatbot UI**: A simple front-end that allows users to ask questions and get responses from the chatbot.
