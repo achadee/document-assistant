@@ -1,19 +1,16 @@
+'use client'
+
 // ive implemented a wrapper component to keep everything stateless
 // ive also made story book launch on startup for your convenience
 // you should be able to see the chat control component in the storybook
 // under localhost:6006
 
 import { useRef } from "react";
-import { ChatBubble, ChatBubbleAction, ChatBubbleAvatar, ChatBubbleMessage } from "./chat-bubble";
+import { ChatBubble, ChatBubbleAvatar, ChatBubbleMessage } from "./chat-bubble";
 import { ChatMessageList } from "./chat-message-list";
 
 import {
-  CopyIcon,
   CornerDownLeft,
-  Mic,
-  Paperclip,
-  RefreshCcw,
-  Volume2,
 } from "lucide-react";
 import { ChatInput } from "./chat-input";
 import { Button } from "../button";
@@ -22,35 +19,25 @@ export type ChatControlProps = {
   /**
    * The initial loading state of the chat on first render
    */
-  isLoading: boolean;
   isGenerating: boolean;
   input: string;
   messages: { content: string; timestamp: string, role: "assistant" | "user" }[];
   onSubmit: (message: string) => void | Promise<void>;
-  onLoadMore: () => void | Promise<void>;
+  onChange: (text: string) => void;
 };
 
-export const ChatControl = (props: ChatControlProps) => {
+export default function ChatControl(props: ChatControlProps) {
 
-  const { isLoading, isGenerating, input, messages, onSubmit, onLoadMore } = props;
+  const { isGenerating, input, messages, onSubmit } = props;
 
   const messagesRef = useRef<HTMLDivElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
 
-  const ChatAiIcons = [
-    {
-      icon: CopyIcon,
-      label: "Copy",
-    },
-    {
-      icon: RefreshCcw,
-      label: "Refresh",
-    },
-    {
-      icon: Volume2,
-      label: "Volume",
-    },
-  ];
+  const onKeyDown = (ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (ev.key === "Enter" && !ev.shiftKey) {
+      ev.preventDefault();
+      onSubmit(input);
+    }
+  };
 
   return (
     <div>
@@ -69,29 +56,6 @@ export const ChatControl = (props: ChatControlProps) => {
               <ChatBubbleMessage
               >
                 {message.content}
-                {message.role === "assistant" &&
-                  messages.length - 1 === index && (
-                    <div className="flex items-center mt-1.5 gap-1">
-                      {!isGenerating && (
-                        <>
-                          {ChatAiIcons.map((icon, iconIndex) => {
-                            const Icon = icon.icon;
-                            return (
-                              <ChatBubbleAction
-                                variant="outline"
-                                className="size-5"
-                                key={iconIndex}
-                                icon={<Icon className="size-3" />}
-                                // onClick={() =>
-                                //   // handleActionClick(icon.label, index)
-                                // }
-                              />
-                            );
-                          })}
-                        </>
-                      )}
-                    </div>
-                  )}
               </ChatBubbleMessage>
             </ChatBubble>
           ))}
@@ -105,31 +69,19 @@ export const ChatControl = (props: ChatControlProps) => {
         )}
       </ChatMessageList>
       <div className="w-full px-4">
-        <form
-          ref={formRef}
-          // onSubmit={(ev) => onSubmit(ev.target.value)}
+        <div
           className="relative rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring"
         >
           <ChatInput
             value={input}
-            // onKeyDown={onKeyDown}
-            // onChange={handleInputChange}
+            onKeyDown={onKeyDown}
+            onChange={(ev) => props.onChange(ev.target.value)}
             placeholder="Type your message here..."
             className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0"
           />
           <div className="flex items-center p-3 pt-0">
-            <Button variant="ghost" size="icon">
-              <Paperclip className="size-4" />
-              <span className="sr-only">Attach file</span>
-            </Button>
-
-            <Button variant="ghost" size="icon">
-              <Mic className="size-4" />
-              <span className="sr-only">Use Microphone</span>
-            </Button>
-
             <Button
-              disabled={!input || isLoading}
+              disabled={!input}
               type="submit"
               size="sm"
               className="ml-auto gap-1.5"
@@ -138,7 +90,7 @@ export const ChatControl = (props: ChatControlProps) => {
               <CornerDownLeft className="size-3.5" />
             </Button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
