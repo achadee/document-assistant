@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { ChatInput } from "./chat-input";
 import { Button } from "../button";
+import { Message } from "@/app/api/chat/route";
 
 export type ChatControlProps = {
   /**
@@ -21,7 +22,7 @@ export type ChatControlProps = {
    */
   isGenerating: boolean;
   input: string;
-  messages: { content: string; timestamp: string, role: "assistant" | "user" }[];
+  messages: Message[];
   onSubmit: (message: string) => void | Promise<void>;
   onChange: (text: string) => void;
 };
@@ -51,7 +52,7 @@ export default function ChatControl(props: ChatControlProps) {
             >
               <ChatBubbleAvatar
                 src=""
-                fallback={message.role == "user" ? "👨🏽" : "🤖"}
+                fallback={message.role == "assistant" ? message.type == "error" ? "❗" : "🤖" : "👨🏽"}
               />
               <ChatBubbleMessage
               >

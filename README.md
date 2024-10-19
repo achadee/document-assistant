@@ -61,9 +61,15 @@ The app will be available at: `http://localhost:3000`
 
 ---
 
-## Project Structure
+## Document Loader
 
-TODO
+To load documents run the following command:
+
+```bash
+npm run load-pdf -- example.pdf
+```
+
+I've included the example pdf in the `/example_documents` folder for your convenience
 
 ---
 

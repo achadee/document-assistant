@@ -1,12 +1,9 @@
 'use client'
 
+import { type Message } from '@/app/api/chat/route';
 import React, { createContext, useState, useContext, ReactNode } from 'react'
 
-type Message = {
-  content: string;
-  timestamp: string;
-  role: "assistant" | "user";
-}
+
 
 interface ChatContextType {
   /**
@@ -42,6 +39,23 @@ interface ChatProviderProps {
   children: ReactNode
 }
 
+const sendMessage = async (message: string) : Promise<Message> => {
+  const response = await fetch("/api/chat", {
+    method: "POST",
+    body: JSON.stringify({ 
+      messages: [
+        { 
+          content: message, 
+          timestamp: new Date().toISOString(), 
+          role: "user" 
+        }
+      ] 
+    }),
+  })
+
+  return response.json()
+}
+
 
 export function ChatProvider({ children }: ChatProviderProps) {
   /**
@@ -54,22 +68,35 @@ export function ChatProvider({ children }: ChatProviderProps) {
   /**
    * function to submit a new message
    */
-  const onSubmit = (message: string) => {
+  const onSubmit = async (message: string) => {
     // first lets add the message to the UI
     setMessages((prev) => [
       ...prev,
-      { content: message, timestamp: new Date().toISOString(), role: "user" },
+      { 
+        content: message,
+        timestamp: new Date().toISOString(), 
+        role: "user", 
+        type: "text" 
+      },
     ])    
 
     // then lets clear the input
     setInput("")
 
-    // send the message to the API endpoint
-    // TODO implement TRPC call here
-
     // set the generating state to true
     setIsGenerating(true)
 
+    // send the message to the API endpoint
+    const generatedMessage = await sendMessage(message)
+    
+    // set the generating state to true
+    setIsGenerating(false)
+
+    // if there is a response, add it to the UI
+    setMessages((prev) => [
+      ...prev,
+      generatedMessage
+    ])
   }
   /**
    * function to change the input text
