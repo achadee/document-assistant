@@ -1,5 +1,6 @@
 // app/api/hello/route.js
 
+import { interpretMessage } from '@/langchain/orchestrator';
 import { NextRequest, NextResponse } from 'next/server';
 
 // some basic types to get the API working
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) : Promise<NextResponse<Message>
 
     // Return a response
     return NextResponse.json({ 
-      content: "Hello, how can I help you today?",
+      content: await interpretMessage(messages[messages.length - 1].content),
       timestamp: new Date().toISOString(),
       role: "assistant",
       type: "text"
