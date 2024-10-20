@@ -5,7 +5,7 @@
 // you should be able to see the chat control component in the storybook
 // under localhost:6006
 
-import { useRef } from "react";
+import { ChangeEvent, useRef } from "react";
 import { ChatBubble, ChatBubbleAvatar, ChatBubbleMessage } from "./chat-bubble";
 import { ChatMessageList } from "./chat-message-list";
 
@@ -15,30 +15,24 @@ import {
 import { ChatInput } from "./chat-input";
 import { Button } from "../button";
 import { Message } from "@/app/api/chat/route";
+import { ChatRequestOptions } from "ai";
 
 export type ChatControlProps = {
   /**
    * The initial loading state of the chat on first render
    */
-  isGenerating: boolean;
   input: string;
   messages: Message[];
-  onSubmit: (message: string) => void | Promise<void>;
-  onChange: (text: string) => void;
+  handleSubmit: (event?: { preventDefault?: (() => void) | undefined; } | undefined, chatRequestOptions?: ChatRequestOptions | undefined) => void;
+  handleInputChange: (e: ChangeEvent<HTMLTextAreaElement> ) => void;
+  isGenerating?: boolean;
 };
 
 export default function ChatControl(props: ChatControlProps) {
 
-  const { isGenerating, input, messages, onSubmit } = props;
+  const { input, messages, handleSubmit, isGenerating, handleInputChange } = props;
 
   const messagesRef = useRef<HTMLDivElement>(null);
-
-  const onKeyDown = (ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (ev.key === "Enter" && !ev.shiftKey) {
-      ev.preventDefault();
-      onSubmit(input);
-    }
-  };
 
   return (
     <div>
@@ -52,7 +46,7 @@ export default function ChatControl(props: ChatControlProps) {
             >
               <ChatBubbleAvatar
                 src=""
-                fallback={message.role == "assistant" ? message.type == "error" ? "❗" : "🤖" : "👨🏽"}
+                fallback={message ? "🤖" : "👨🏽"}
               />
               <ChatBubbleMessage
               >
@@ -70,13 +64,13 @@ export default function ChatControl(props: ChatControlProps) {
         )}
       </ChatMessageList>
       <div className="w-full px-4">
-        <div
+        <form
+          onSubmit={handleSubmit}
           className="relative rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring"
         >
           <ChatInput
             value={input}
-            onKeyDown={onKeyDown}
-            onChange={(ev) => props.onChange(ev.target.value)}
+            onChange={handleInputChange}
             placeholder="Type your message here..."
             className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0"
           />
@@ -91,7 +85,7 @@ export default function ChatControl(props: ChatControlProps) {
               <CornerDownLeft className="size-3.5" />
             </Button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

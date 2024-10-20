@@ -1,10 +1,13 @@
 import { QdrantClient } from "@qdrant/js-client-rest";
+import { v4 as uuidv4 } from 'uuid';
 const client = new QdrantClient({ host: "vector-db", port: 6333 });
 
+// because tsnode its run from outside docker
+const tsNodeClient = new QdrantClient({ host: "localhost", port: 6333 });
+
 export type VectorWithMeta = {
-  id: string | number,
-  vector: number[],
-  payload: Record<string, unknown>
+  embedding: number[];
+  value: string;
 }
 
 type SupportedDistance =
@@ -16,7 +19,7 @@ const createCollection = async (
   vectorSize: number, 
   distance: SupportedDistance
 ) => {
-  return await client.createCollection(collectionName, {
+  return await tsNodeClient.createCollection(collectionName, {
     vectors: { size: vectorSize, distance },
   });
 }
@@ -30,14 +33,12 @@ export const queryCollection = async (
 
   const generatedCollectionName = `${collectionName}_${vector.length}_${distance}`;
 
-  console.log(`Querying collection ${generatedCollectionName}`, vector.length);
-
   return await client.query(generatedCollectionName, {
     query: vector,
     limit,
+    offset: 0,
     with_payload: true,
   });
- 
 
 }
 
@@ -56,24 +57,28 @@ export const insertVectors = async (
   }
 
   // generated collection name
-  const generatedCollectionName = `${collectionName}_${firstVector.vector.length}_${distance}`;
+  const generatedCollectionName = `${collectionName}_${firstVector.embedding.length}_${distance}`;
 
   // get the collection to see if it exists
   try {
-    const collection = await client.getCollection(generatedCollectionName);
+    const collection = await tsNodeClient.getCollection(generatedCollectionName);
     if (!collection) {
-      console.log(`Creating collection ${generatedCollectionName}`);
-      await createCollection(generatedCollectionName, firstVector.vector.length, distance);
+      await createCollection(generatedCollectionName, firstVector.embedding.length, distance);
     }
   }
   catch (e) {
-    console.log(`Creating collection ${generatedCollectionName}`);
-    await createCollection(generatedCollectionName, firstVector.vector.length, distance);
+    await createCollection(generatedCollectionName, firstVector.embedding.length, distance);
   }
 
-  return await client.upsert(generatedCollectionName, {
+  return await tsNodeClient.upsert(generatedCollectionName, {
     wait: true,
-    points: vectors,
+    points: vectors.map(v => ({ 
+      id: uuidv4(),
+      vector: v.embedding, 
+      payload: {
+        value: v.value 
+      }
+    })),
   });
 }
 
