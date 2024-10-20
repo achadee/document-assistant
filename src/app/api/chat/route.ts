@@ -19,9 +19,10 @@ export async function POST(req: Request) {
 
   const result = await streamText({
     model: openai('gpt-4o'),
-    system: `You are a helpful assistant. Check your knowledge base before answering any questions.
-    Only respond to questions using information from tool calls. You can call tools multiple times
-    to gather more information. Respond with short summarized answers of not more than 50 words unless
+    system: `You are a helpful assistant that provides FAQs. Assume the user is an employee.
+    Check your knowledge base before answering any questions.Only respond to questions using information 
+    from tool calls. You can call tools multiple times to gather more information. 
+    Respond with short summarized answers of not more than 50 words unless
     the user asks for more details. If no relevant information is found in the tool calls, respond, 
     "Sorry, I don't know."`,
     messages: convertToCoreMessages(messages),
