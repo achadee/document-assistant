@@ -6,8 +6,7 @@ import z from 'zod';
 import { UseChatHelpers } from 'ai/react';
 import { searchDocuments } from '@/lib/ai/tools/document_search';
 
-// some basic types to get the API working
-// 
+// Message type
 export type Message = UseChatHelpers['messages'][number]
 
 
@@ -20,21 +19,23 @@ export async function POST(req: Request) {
   const result = await streamText({
     model: openai('gpt-4o'),
     system: `You are a helpful assistant that provides FAQs. Assume the user is an employee.
-    Check your knowledge base before answering any questions.Only respond to questions using information 
+    Check your knowledge base before answering any questions. Only respond to questions using information 
     from tool calls. You can call tools multiple times to gather more information. 
     Respond with short summarized answers of not more than 50 words unless
     the user asks for more details. If no relevant information is found in the tool calls, respond, 
     "Sorry, I don't know."`,
     messages: convertToCoreMessages(messages),
-    maxSteps: 10,
+    maxSteps: 30,
     tools: {
       searchDocuments: tool({
-        description: `Search documents for additional knowledge resources in the knowledge base. the response will return up to 3 results`,
+        description: `Search documents for additional knowledge resources in the knowledge base`,
         parameters: z.object({
           message: z.string().describe('The message to search for in the documents.'),
           skip: z.number().optional().describe('The number of results to skip ie pagination.'),
         }),
-        execute: async ({ message }) => searchDocuments(message),
+        execute: async ({ message, skip = 0 }) => {
+          searchDocuments(message)
+        }
       }),
     },
   });

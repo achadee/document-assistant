@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import { ChatControl } from './chat-control'
+import ChatControl from './chat-control'
 import React from 'react'
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
@@ -34,42 +34,14 @@ export const Default: Story = {
   args: {
     messages: [
       {
-        content: 'Hello!',
-        timestamp: '2022-01-01T00:00:00Z',
-        role: 'assistant'
-      },
-      {
-        content: 'Hi!',
-        timestamp: '2022-01-01T00:00:01Z',
-        role: 'user'
+        id: '1',
+        content: 'Hello',
+        role: 'user',
       }
     ],
-    isLoading: false,
     isGenerating: false,
     input: '',
-    onSubmit: () => {},
-    onLoadMore: () => {}
-  }
-}
-
-export const IsGenerating: Story = {
-  args: {
-    messages: [
-      {
-        content: 'Hello!',
-        timestamp: '2022-01-01T00:00:00Z',
-        role: 'assistant'
-      },
-      {
-        content: 'Hi!',
-        timestamp: '2022-01-01T00:00:01Z',
-        role: 'user'
-      }
-    ],
-    isLoading: false,
-    isGenerating: true,
-    input: '',
-    onSubmit: () => {},
-    onLoadMore: () => {}
+    handleSubmit: () => {},
+    handleInputChange: () => {},
   }
 }

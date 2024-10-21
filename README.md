@@ -42,7 +42,16 @@ OPENAI_API_KEY=your_openai_api_key_here
 NEXT_PUBLIC_API_URL=http://localhost:3000/api
 ```
 
-### 3. Run with Docker
+### 3. Storybook
+
+You can view the react components in isolation in storybook
+
+```bash
+npm run storybook
+```
+
+
+### 4. Run with Docker
 
 Build and start the application using Docker:
 
@@ -72,43 +81,26 @@ npm run load-pdf -- example.pdf
 
 I've included the example pdf in the `/example_documents` folder for your convenience
 
----
-
-## API Endpoints
-
-TODO
-
----
 
 ## Architectural & Design Choices
 
-TODO
+I've implemented a simple RAG <> Single agent design.
+
+- Cosine Distance, using Qdrant
+- Chunking via Paragraph
+- Feedback loop to evaluate messages
+- model, GPT-4o
+- embeddings, OpenAI text-embedding-ada-002
 
 ---
 
 ## Challenges & Improvements
 
-TODO
+Unfortunatly time wasnt on my side with this one, so I had to spin this up in between work and life. Some obvious improvements:
 
-
----
-
-## Running Locally (Without Docker)
-
-Alternatively, you can run the app locally without Docker.
-
-1. **Install Dependencies**:
-
-```bash
-npm install
-```
-
-2. **Run the App**:
-
-```bash
-npm run dev
-```
-
-The app will run on `http://localhost:3000`.
-
----
+- Using Additional agents to evaluate the responses
+- Moving to a more flexible orchestrator like langchian
+- Chunking more intellengently with llm's rather that a regex + algorithm
+- Pre processing and summarizing documents with llms for quick extrapolation
+- Experimenting with different llm responses and determining which has the best answer
+- Prompt fine tuning
