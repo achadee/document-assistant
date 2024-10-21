@@ -38,6 +38,11 @@ cd document-assistant
 Create a `.env` file in the root of your project with the following keys:
 
 ```
+# QDRANT variables
+QDRANT_COLLECTION_NAME="documents"
+QDRANT_DISCTANCE="cosine"
+
+
 OPENAI_API_KEY=your_openai_api_key_here
 NEXT_PUBLIC_API_URL=http://localhost:3000/api
 ```
